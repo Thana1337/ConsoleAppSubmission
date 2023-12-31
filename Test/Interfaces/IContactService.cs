@@ -1,7 +1,9 @@
-﻿public interface IContactService
+﻿using Test.Models;
+
+public interface IContactService
 {
-    void AddContact();
+    void AddContact(Contact contact);
     void DeleteContactByEmail();
     void SaveContacts();
-    void ShowContacts();
+    IEnumerable<IContact> ShowContact();
 }

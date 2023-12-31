@@ -10,8 +10,8 @@ using Test.Services;
 
 var builder = Host.CreateDefaultBuilder().ConfigureServices(services => 
 { 
-    services.AddTransient<IContactService, ContactService>();
     services.AddTransient<IMenuService, MenuService>();
+    services.AddSingleton<IContactService, ContactService>();
     
 }).Build();
 var serviceProvider = builder.Services;

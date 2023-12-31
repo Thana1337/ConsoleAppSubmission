@@ -11,17 +11,19 @@ using Test.Utilities;
 public class ContactService : IContactService
 {
 
-    private const string FileName = @"D:\Projects\Test\contacts.json";
-    private List<Contact> contacts;
+    private readonly string FileName = @"D:\Projects\Test\contacts.json";
+    private ICollection<Contact> contacts;
     public ContactService()
     {
+
         // Load contacts from the file
         contacts = LoadContacts();
     }
 
-        // Adding Contact Method
-    public void AddContact()
-    {   
+
+    // Adding Contact Method
+    public void AddContact(Contact contact)
+    {
         Console.Clear();
         Console.Write("Enter a name: ");
         var firstName = Console.ReadLine();
@@ -40,7 +42,7 @@ public class ContactService : IContactService
         var address = Console.ReadLine();
 
         // Check for valid input and use regular expressions for email and phone number validation
-        if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(email) && RegularExpression.IsValidEmail(email) && RegularExpression.IsValidPhoneNumber(PhoneNumber = null!))
+        if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(email) && RegularExpression.IsValidEmail(email) && PhoneNumber?.Length == 10)
         {
             // If valid create a new contact and add it to the list
             var newContact = new Contact
@@ -58,7 +60,7 @@ public class ContactService : IContactService
             Console.WriteLine("-----------------------------------------------------------------");
             Console.ReadKey();
         }
-            // Else show error message
+        // Else show error message
         else
         {
             Console.WriteLine("-----------------------------------------------------------------");
@@ -69,7 +71,7 @@ public class ContactService : IContactService
     }
 
     // Show Contact Method
-    public void ShowContacts()
+    public IEnumerable<IContact> ShowContact()
     {
         Console.Clear();
         Console.WriteLine("Contacts:");
@@ -91,12 +93,13 @@ public class ContactService : IContactService
 
         Console.WriteLine("\nPress any key to continue...");
         Console.ReadKey();
+        return contacts;
     }
 
     // Delete by Email Method
     public void DeleteContactByEmail()
     {
-        Console.Clear ();
+        Console.Clear();
         Console.Write("Enter the email of the contact to delete: ");
         Console.WriteLine("\n-----------------------------------------------------------------");
 
@@ -124,20 +127,28 @@ public class ContactService : IContactService
     // Save Contact Method
     public void SaveContacts()
     {
-        var contact = JsonConvert.SerializeObject(contacts);
-        File.WriteAllText(FileName, contact);
+        // Use FileStream to avoid file handle issues
+        using (var fileStream = new FileStream(FileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+        using (var sw = new StreamWriter(fileStream))
+        {
+            var contactJson = JsonConvert.SerializeObject(contacts);
+            sw.Write(contactJson);
+        }
     }
     // Load Contact From File Method
     private List<Contact> LoadContacts()
     {
-        // If file exist
+        // If file exists
         if (File.Exists(FileName))
         {
-            // If exist then read file and deserialize 
-            var contact = File.ReadAllText(FileName);
-            return JsonConvert.DeserializeObject<List<Contact>>(contact) ?? new List<Contact>();
+            // Use FileStream to avoid file handle issues
+            using (var fileStream = new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(fileStream))
+            {
+                var contactJson = reader.ReadToEnd();
+                return JsonConvert.DeserializeObject<List<Contact>>(contactJson) ?? new List<Contact>();
+            }
         }
-        // If not exist, return new empty file.
         return new List<Contact>();
     }
 }
