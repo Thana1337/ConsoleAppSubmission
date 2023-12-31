@@ -1,5 +1,6 @@
 ﻿using System;
 using Test.Interfaces;
+using Test.Models;
 
 namespace Test.Services
 {
@@ -33,11 +34,11 @@ namespace Test.Services
                 switch (option)
                 {
                     case "1":
-                        _contactService.AddContact();
+                        _contactService.AddContact(new Contact());
                         _contactService.SaveContacts();
                         break;
                     case "2":
-                        _contactService.ShowContacts();
+                        var contacts = _contactService.ShowContact();
                         break;
                     case "3":
                         _contactService.DeleteContactByEmail();
