@@ -23,19 +23,15 @@ namespace Test.tests
                 Address = "Banangatan 1"
             };
 
-            // Set up the AddContact method to capture the passed contact
             mockContactService.Setup(c => c.AddContact(It.IsAny<Contact>())).Callback<Contact>(contact =>
             {
-                // Assert the contact values here if needed
                 Assert.Equal(testContact.Firstname, contact.Firstname);
-                // Add other assertions for other properties
             });
 
             // Act
             mockContactService.Object.AddContact(testContact);
 
             // Assert
-            // Add additional assertions or verifications if needed
             mockContactService.Verify(c => c.AddContact(It.IsAny<Contact>()), Times.Once);
         }
 

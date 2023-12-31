@@ -127,7 +127,6 @@ public class ContactService : IContactService
     // Save Contact Method
     public void SaveContacts()
     {
-        // Use FileStream to avoid file handle issues
         using (var fileStream = new FileStream(FileName, FileMode.Create, FileAccess.Write, FileShare.Read))
         using (var sw = new StreamWriter(fileStream))
         {
@@ -141,11 +140,11 @@ public class ContactService : IContactService
         // If file exists
         if (File.Exists(FileName))
         {
-            // Use FileStream to avoid file handle issues
             using (var fileStream = new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var reader = new StreamReader(fileStream))
             {
                 var contactJson = reader.ReadToEnd();
+                // Deserialize and return the list of contacts, or an new empty list if null
                 return JsonConvert.DeserializeObject<List<Contact>>(contactJson) ?? new List<Contact>();
             }
         }
